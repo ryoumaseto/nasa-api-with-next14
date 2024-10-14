@@ -4,6 +4,65 @@ import { z } from 'zod'
 
 const NASA_API_KEY = process.env.NASA_API_KEY
 
+const neoSchema = z.object({
+    links: z.object({
+        next: z.string(),
+        previous: z.string(),
+        self: z.string(),
+    }),
+    element_count: z.number(),
+    near_earth_objects: z.record(
+        z.array(
+            z.object({
+                id: z.string(),
+                neo_reference_id: z.string(),
+                name: z.string(),
+                nasa_jpl_url: z.string(),
+                absolute_magnitude_h: z.number(),
+                estimated_diameter: z.object({
+                    kilometers: z.object({
+                        estimated_diameter_min: z.number(),
+                        estimated_diameter_max: z.number(),
+                    }),
+                    meters: z.object({
+                        estimated_diameter_min: z.number(),
+                        estimated_diameter_max: z.number(),
+                    }),
+                    miles: z.object({
+                        estimated_diameter_min: z.number(),
+                        estimated_diameter_max: z.number(),
+                    }),
+                    feet: z.object({
+                        estimated_diameter_min: z.number(),
+                        estimated_diameter_max: z.number(),
+                    }),
+                }),
+                is_potentially_hazardous_asteroid: z.boolean(),
+                close_approach_data: z.array(
+                    z.object({
+                        close_approach_date: z.string(),
+                        close_approach_date_full: z.string(),
+                        epoch_date_close_approach: z.number(),
+                        relative_velocity: z.object({
+                            kilometers_per_second: z.string(),
+                            kilometers_per_hour: z.string(),
+                            miles_per_hour: z.string(),
+                        }),
+                        miss_distance: z.object({
+                            astronomical: z.string(),
+                            lunar: z.string(),
+                            kilometers: z.string(),
+                            miles: z.string(),
+                        }),
+                        orbiting_body: z.string(),
+                    })
+                ),
+                is_sentry_object: z.boolean(),
+            })
+        )
+    ),
+})
+
 const apodSchema = z.object({
     date: z.string(),
     explanation: z.string(),
@@ -66,3 +125,36 @@ export async function getMarsPhotos(rover: string ,date?: string, camera?: strin
         throw new Error('Invalid Mars photos data received from NASA API')
     }
 }
+
+export async function getNeoData(startDate: string, endDate: string) {
+    const url = `https://api.nasa.gov/neo/rest/v1/feed?start_date=${startDate}&end_date=${endDate}&api_key=${NASA_API_KEY}`
+    const response = await fetch(url)
+    if (!response.ok) {
+        throw new Error(`Failed to fetch NEO data: ${response.statusText}`)
+    }
+    const data = await response.json()
+    try {
+        return neoSchema.parse(data)
+    } catch (e) {
+        console.error('NEO data validation error:', e)
+        throw new Error('Invalid NEO data received from NASA API')
+    }
+  }
+  
+  export async function getEpicData(date: string) {
+    const url = `https://api.nasa.gov/EPIC/api/natural/date/${date}?api_key=${NASA_API_KEY}`
+    const response = await fetch(url)
+    console.log(url)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch EPIC data: ${response.statusText}`)
+    }
+    const data = await response.json()
+    try {
+        console.log(url)
+        console.log(data)
+      return (data)
+    } catch (e) {
+      console.error('EPIC data validation error:', e)
+      throw new Error('Invalid EPIC data received from NASA API')
+    }
+  }

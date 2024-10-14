@@ -14,6 +14,16 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
+                hostname: 'epic.gsfc.nasa.gov',
+                pathname: '/archive/natural/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'neo.sci.gsfc.nasa.gov',
+                pathname: '/servlet/RenderData/**',
+            },
+            {
+                protocol: 'https',
                 hostname: 'www.youtube.com',
                 pathname: '/embed/**',
             },

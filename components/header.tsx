@@ -3,12 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Home, Image, Camera } from '@mui/icons-material'
+import { Home, Image, Camera, Star, Public as Earth } from '@mui/icons-material'
 
 const navItems = [
   { href: '/', label: 'ホーム', icon: Home },
   { href: '/apod', label: 'APOD', icon: Image },
   { href: '/mars-rover', label: '火星探査車', icon: Camera },
+  { href: '/neo', label: 'NEO', icon: Star },
+  { href: '/earth', label: '地球', icon: Earth },
 ]
 
 export function Header() {
